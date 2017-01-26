@@ -16,6 +16,6 @@ Enter your pluses, deltas and action items for the last release.  All the data i
 
 ## Pro Tip
 
-You can even add other apps to the page to seed the retro conversation with some context on how everything went.  Here is an example page which includes the Release Summary app and an Release Burndown app as well.
+You can even add other apps to the page to seed the retro conversation with some context on how everything went.  Here is an example page which includes the Release Cumulative Flow app and a Release Burnup app as well.
 
 ![team retrospective](images/retro-page.png "Team Retrospective Page Screenshot")
