@@ -4,10 +4,10 @@ var REQUIRED_FIELDS = {
     c_RetroActions: 'Retro Actions'
 };
 
-Ext.define('IterationRetroApp', {
+Ext.define('ReleaseRetroApp', {
     extend: 'Rally.app.TimeboxScopedApp',
     componentCls: 'app',
-    scopeType: 'iteration',
+    scopeType: 'release',
     supportsUnscheduled: false,
 
     initComponent: function() {
@@ -25,15 +25,15 @@ Ext.define('IterationRetroApp', {
         if (!this.models) {
             Rally.data.wsapi.ModelFactory.getModels({
                 context: this.getContext(),
-                types: ['Iteration', 'AttributeDefinition'],
+                types: ['Release', 'AttributeDefinition'],
                 success: function(models) {
                     this.models = models;
-                    this._loadIteration();
+                    this._loadRelease();
                 },
                 scope: this
             });
         } else {
-            this._loadIteration();
+            this._loadRelease();
         }
     },
 
@@ -45,13 +45,13 @@ Ext.define('IterationRetroApp', {
         }
     },
 
-    _loadIteration: function() {
+    _loadRelease: function() {
         var id = this.getContext().getTimeboxScope().getRecord().getId();
-        this.models.Iteration.load(id, {
+        this.models.Release.load(id, {
             fetch: _.keys(REQUIRED_FIELDS)
         }).then({
-            success: function(iteration) {
-                this.iteration = iteration;
+            success: function(release) {
+                this.release = release;
                 this._checkForFields();
             },
             scope: this
@@ -71,12 +71,12 @@ Ext.define('IterationRetroApp', {
                     {
                         xtype: 'component',
                         cls: 'primary-message',
-                        html: 'One or more required Iteration custom fields are missing.'
+                        html: 'One or more required Release custom fields are missing.'
                     },
                     {
                         xtype: 'component',
                         cls: 'secondary-message',
-                        html: 'This app uses custom fields on Iteration to store retro pluses, deltas and action items.'
+                        html: 'This app uses custom fields on Release to store retro pluses, deltas and action items.'
                     },
                     {
                         xtype: 'component',
@@ -132,7 +132,7 @@ Ext.define('IterationRetroApp', {
             showUndoButton: true,
             margin: '0 10px',
             height: 200,
-            value: this.iteration.get(fieldName),
+            value: this.release.get(fieldName),
             listeners: {
                 blur: this._onEditorChange,
                 scope: this
@@ -141,7 +141,7 @@ Ext.define('IterationRetroApp', {
     },
 
     _fieldExists: function(name) {
-        return !!_.find(this.models.Iteration.getFields(), function(field) {
+        return !!_.find(this.models.Release.getFields(), function(field) {
             return field.isCustom() && field.getType() === 'text' && field.name === name;
         });
     },
@@ -171,7 +171,7 @@ Ext.define('IterationRetroApp', {
             Filterable: true,
             Sortable: false,
             Name: REQUIRED_FIELDS[name],
-            TypeDefinition: Rally.util.Ref.getRelativeUri(this.models.Iteration.typeDefinition)
+            TypeDefinition: Rally.util.Ref.getRelativeUri(this.models.Release.typeDefinition)
         });
         return newField.save();
     },
@@ -180,10 +180,10 @@ Ext.define('IterationRetroApp', {
         Rally.data.wsapi.ModelFactory.clearModels();
         Rally.data.wsapi.ModelFactory.getModel({
             context: this.getContext(),
-            type: 'Iteration'
+            type: 'Release'
         }).then({
             success: function(model) {
-                this.models.Iteration = model;
+                this.models.Release = model;
                 this.setLoading(false);
                 this.onScopeChange();
             },
@@ -192,12 +192,12 @@ Ext.define('IterationRetroApp', {
     },
 
     _onEditorChange: function(editor) {
-        this.iteration.set(editor.fieldName, editor.getValue());
-        this.iteration.save({
+        this.release.set(editor.fieldName, editor.getValue());
+        this.release.save({
             fetch: _.keys(REQUIRED_FIELDS)
         }).then({
-            success: function(iteration) {
-                this.iteration = iteration;
+            success: function(release) {
+                this.release = release;
                 Ext.create('Rally.ui.detail.view.SavedIndicator', {
                     target: editor
                 });
